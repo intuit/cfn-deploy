@@ -32,7 +32,3 @@ The cutom env variables to be addeed are
 `TEMPLATE_FILE` - Cloudformation template yaml file<br>
 `PARAMETERS_FILE` - Input parameters to the cloudformation stack as json file<br>
 `CAPABLITIES` - IAM capablities for the cloudformation stack<br>
-
-
-License
-The Dockerfile and associated scripts and documentation in this project are released under the <> License.
