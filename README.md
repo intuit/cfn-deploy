@@ -19,8 +19,8 @@ An example workflow for deploying a cloudformation template follows.
 ```
 
 Secrets
-AWS_ACCESS_KEY_ID – Required The AWS access key part of your credentials [more info](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets)
-AWS_SECRET_ACCESS_KEY – Required The AWS secret access key part of your credentials [more info](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets)
+ - AWS_ACCESS_KEY_ID – (Required) The AWS access key part of your credentials [more info](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets)
+ - AWS_SECRET_ACCESS_KEY – (Required) The AWS secret access key part of your credentials [more info](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets)
 
 Environment variables
 All environment variables listed in the official documentation are supported.
