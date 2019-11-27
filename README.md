@@ -1,5 +1,5 @@
 # cfn-deploy
-<img src="https://github.com/intuit/cfn-deploy/blob/master/.github/cfn-deploy-logo.png" align=right alt="cfn-deploy" width="200" height="300"> 
+<img src="https://github.com/intuit/cfn-deploy/blob/master/.github/cfn-deploy-logo.png" align=right alt="cfn-deploy" width="250"> 
 A simple github action to deploy cloudformation yaml files to AWS
 
 Usage
