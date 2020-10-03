@@ -29,6 +29,17 @@ aws configure --profile ${AWS_PROFILE} set aws_access_key_id ${AWS_ACCESS_KEY_ID
 aws configure --profile ${AWS_PROFILE} set aws_secret_access_key ${AWS_SECRET_ACCESS_KEY}
 aws configure --profile ${AWS_PROFILE} set region ${AWS_REGION}
 
+send-slack-notification(){
+    if [[ ! -z "$SLACK_WEBHOOK_URL" ]] ; then  
+        if [[ -z "$SLACK_MESSAGE_STRING" ]] ; then
+            curl -X POST -H 'Content-type: application/json' \
+            --data '{"text":"Stack Deployed Successfully"}' $SLACK_WEBHOOK_URL
+        else
+            curl -X POST -H 'Content-type: application/json' \
+            --data '{"text":"'$SLACK_MESSAGE_STRING'"}' $SLACK_WEBHOOK_URL
+        fi
+    fi
+}
 
 cfn-deploy(){
    #Paramters
@@ -107,6 +118,9 @@ cfn-deploy(){
     fi
 
     echo -e "\nSUCCESSFULLY UPDATED - $2"
+    
+    send-slack-notification
+
 }
 
 cfn-deploy $AWS_REGION $STACK_NAME $TEMPLATE_FILE $PARAMETERS_FILE $CAPABLITIES

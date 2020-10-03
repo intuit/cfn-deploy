@@ -10,7 +10,7 @@ LABEL com.github.actions.description="Cloudformation Github Deploy"
 LABEL com.github.actions.icon="upload-cloud"
 LABEL com.github.actions.color="orange"
 
-RUN apt-get update && apt-get install -y awscli && \
+RUN apt-get update && apt-get install -y awscli curl && \
 rm -rf /var/lib/apt/lists/*
 
 ADD entrypoint.sh /entrypoint.sh

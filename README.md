@@ -16,6 +16,8 @@ An example workflow for deploying a cloudformation template follows.
         CAPABLITIES: CAPABILITY_IAM
         AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
         AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+        SLACK_WEBHOOK_URL: ${{secrets.SLACK_WEBHOOK_URL}}
+        SLACK_MESSAGE_STRING: ${{secrets.SLACK_MESSAGE_STRING}}
 
 ```
 
@@ -36,6 +38,8 @@ The custom env variables to be added are:
 `TEMPLATE_FILE` - Cloudformation template yaml file<br>
 `PARAMETERS_FILE` - Input parameters to the cloudformation stack as json file<br>
 `CAPABLITIES` - IAM capablities for the cloudformation stack<br>
+`SLACK_WEBHOOK_URL` - (Not Required) Slack webhook url for Slack Notification. Refer [Slack Documentation](https://api.slack.com/tutorials/slack-apps-hello-world)<br>
+`SLACK_MESSAGE_STRING` - (Not Required) Message string for the Slack Notification. Refer [Slack Documentation](https://api.slack.com/reference/surfaces/formatting) <br>
 
 ## Contributing
 
