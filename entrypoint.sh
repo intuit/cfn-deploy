@@ -25,6 +25,14 @@ if [[ -z "$AWS_REGION" ]];then
 echo "AWS_REGION is not SET!"; exit 3
 fi
 
+if [[ -z "$WAIT_TIMEOUT" ]];then
+echo "WAIT_TIMEOUT is not set. Defaulting to no timeout";
+WAIT_TIMEOUT=0
+if ! [[ "$WAIT_TIMEOUT" -eq "$WAIT_TIMEOUT" ]];
+then
+echo "WAIT_TIMEOUT should be a number." ; exit 4
+fi
+
 aws configure --profile ${AWS_PROFILE} set aws_access_key_id ${AWS_ACCESS_KEY_ID}
 aws configure --profile ${AWS_PROFILE} set aws_secret_access_key ${AWS_SECRET_ACCESS_KEY}
 aws configure --profile ${AWS_PROFILE} set region ${AWS_REGION}
@@ -43,6 +51,7 @@ cfn-deploy(){
     template=$3
     parameters=$4
     capablities=$5
+    wait_timeout=$6
 
     ARG_CMD=" "
     if [[ ! -z $template ]];then
@@ -71,7 +80,7 @@ cfn-deploy(){
         $ARG_STRING
 
     echo "\nSLEEP STILL STACK CREATES zzz ..."
-    aws cloudformation wait stack-create-complete \
+    timeout $wait_timeout aws cloudformation wait stack-create-complete \
         --region $1 \
         --stack-name $2 \
 
@@ -100,7 +109,7 @@ cfn-deploy(){
     fi
 
     echo "STACK UPDATE CHECK ..."
-    aws cloudformation wait stack-update-complete \
+    timeout $wait_timeout aws cloudformation wait stack-update-complete \
         --region $1 \
         --stack-name $2 \
 
@@ -109,4 +118,4 @@ cfn-deploy(){
     echo -e "\nSUCCESSFULLY UPDATED - $2"
 }
 
-cfn-deploy $AWS_REGION $STACK_NAME $TEMPLATE_FILE $PARAMETERS_FILE $CAPABLITIES
+cfn-deploy $AWS_REGION $STACK_NAME $TEMPLATE_FILE $PARAMETERS_FILE $CAPABLITIES $WAIT_TIMEOUT
