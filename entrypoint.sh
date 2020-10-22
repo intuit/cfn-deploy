@@ -25,10 +25,18 @@ if [[ -z "$AWS_REGION" ]];then
 echo "AWS_REGION is not SET!"; exit 3
 fi
 
+
 aws configure --profile ${AWS_PROFILE} set aws_access_key_id "${AWS_ACCESS_KEY_ID}"
 aws configure --profile ${AWS_PROFILE} set aws_secret_access_key "${AWS_SECRET_ACCESS_KEY}"
 aws configure --profile ${AWS_PROFILE} set region "${AWS_REGION}"
 
+if [[ -z "$WAIT_TIMEOUT" ]];then
+echo "WAIT_TIMEOUT is not set. Defaulting to no timeout";
+WAIT_TIMEOUT=0
+if ! [[ "$WAIT_TIMEOUT" -eq "$WAIT_TIMEOUT" ]];
+then
+echo "WAIT_TIMEOUT should be a number." ; exit 4
+fi
 
 cfn-deploy(){
    #Paramters
@@ -41,6 +49,7 @@ cfn-deploy(){
     template=$3
     parameters=$4
     capablities=$5
+    wait_timeout=$6
 
     ARG_CMD=" "
     if [[ -n $template ]];then
@@ -62,6 +71,10 @@ cfn-deploy(){
 
     if ! aws cloudformation describe-stacks --region "$1" --stack-name "$2" ; then
 
+    echo -e "\nSTACK DOES NOT EXISTS, RUNNING VALIDATE"
+    aws cloudformation validate-template \
+        --template-body file://${template}
+
     echo -e "\nSTACK DOES NOT EXISTS, RUNNING CREATE"
     # shellcheck disable=SC2086
     aws cloudformation create-stack \
@@ -69,8 +82,8 @@ cfn-deploy(){
         --stack-name "$2" \
         $ARG_STRING
 
-    echo -e "\nSLEEP STILL STACK CREATES zzz ..."
-    aws cloudformation wait stack-create-complete \
+    echo "\nSLEEP STILL STACK CREATES zzz ..."
+    timeout $wait_timeout aws cloudformation wait stack-create-complete \
         --region "$1" \
         --stack-name "$2" \
 
@@ -100,7 +113,8 @@ cfn-deploy(){
     fi
 
     echo "STACK UPDATE CHECK ..."
-    aws cloudformation wait stack-update-complete \
+
+    timeout $wait_timeout aws cloudformation wait stack-update-complete \
         --region "$1" \
         --stack-name "$2" \
 
@@ -109,4 +123,6 @@ cfn-deploy(){
     echo -e "\nSUCCESSFULLY UPDATED - $2"
 }
 
-cfn-deploy "$AWS_REGION" "$STACK_NAME" "$TEMPLATE_FILE" "$PARAMETERS_FILE" "$CAPABILITIES"
+
+cfn-deploy "$AWS_REGION" "$STACK_NAME" "$TEMPLATE_FILE" "$PARAMETERS_FILE" "$CAPABLITIES" "$WAIT_TIMEOUT"
+

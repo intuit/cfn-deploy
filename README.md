@@ -36,6 +36,8 @@ The custom env variables to be added are:
 `TEMPLATE_FILE` - Cloudformation template yaml file<br>
 `PARAMETERS_FILE` - Input parameters to the cloudformation stack as json file<br>
 `CAPABLITIES` - IAM capablities for the cloudformation stack<br>
+#### Optional
+`WAIT_TIMEOUT` - Timeout in seconds to exit from "wait" of create/update stack.  
 
 ## Contributing
 
