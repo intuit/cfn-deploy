@@ -25,6 +25,11 @@ if [[ -z "$AWS_REGION" ]];then
 echo "AWS_REGION is not SET!"; exit 3
 fi
 
+
+aws configure --profile ${AWS_PROFILE} set aws_access_key_id "${AWS_ACCESS_KEY_ID}"
+aws configure --profile ${AWS_PROFILE} set aws_secret_access_key "${AWS_SECRET_ACCESS_KEY}"
+aws configure --profile ${AWS_PROFILE} set region "${AWS_REGION}"
+
 if [[ -z "$WAIT_TIMEOUT" ]];then
 echo "WAIT_TIMEOUT is not set. Defaulting to no timeout";
 WAIT_TIMEOUT=0
@@ -33,11 +38,6 @@ then
 echo "WAIT_TIMEOUT should be a number." ; exit 4
 fi
 
-aws configure --profile ${AWS_PROFILE} set aws_access_key_id ${AWS_ACCESS_KEY_ID}
-aws configure --profile ${AWS_PROFILE} set aws_secret_access_key ${AWS_SECRET_ACCESS_KEY}
-aws configure --profile ${AWS_PROFILE} set region ${AWS_REGION}
-
-
 cfn-deploy(){
    #Paramters
    # region       - the AWS region
@@ -45,22 +45,20 @@ cfn-deploy(){
    # template     - the template file
    # parameters   - the paramters file
    # capablities  - capablities for IAM
-   
-    region=$1
-    stack=$2
+
     template=$3
     parameters=$4
     capablities=$5
     wait_timeout=$6
 
     ARG_CMD=" "
-    if [[ ! -z $template ]];then
+    if [[ -n $template ]];then
         ARG_CMD="${ARG_CMD}--template-body file://${template} "
     fi
-    if [[ ! -z $parameters ]];then
+    if [[ -n $parameters ]];then
         ARG_CMD="${ARG_CMD}--parameters file://${parameters} "
     fi
-    if [[ ! -z $capablities ]];then
+    if [[ -n $capablities ]];then
         ARG_CMD="${ARG_CMD}--capabilities ${capablities} "
     fi
 
@@ -71,31 +69,33 @@ cfn-deploy(){
 
     echo -e "\nVERIFYING IF CFN STACK EXISTS ...!"
 
-    if ! aws cloudformation describe-stacks --region $1 --stack-name $2 ; then
+    if ! aws cloudformation describe-stacks --region "$1" --stack-name "$2" ; then
 
     echo -e "\nSTACK DOES NOT EXISTS, RUNNING VALIDATE"
     aws cloudformation validate-template \
         --template-body file://${template}
 
     echo -e "\nSTACK DOES NOT EXISTS, RUNNING CREATE"
+    # shellcheck disable=SC2086
     aws cloudformation create-stack \
-        --region $1 \
-        --stack-name $2 \
+        --region "$1" \
+        --stack-name "$2" \
         $ARG_STRING
 
     echo "\nSLEEP STILL STACK CREATES zzz ..."
     timeout $wait_timeout aws cloudformation wait stack-create-complete \
-        --region $1 \
-        --stack-name $2 \
+        --region "$1" \
+        --stack-name "$2" \
 
     else
 
     echo -e "\n STACK IS AVAILABLE, TRYING TO UPDATE !!"
 
     set +e
+    # shellcheck disable=SC2086
     stack_output=$( aws cloudformation update-stack \
-        --region $1 \
-        --stack-name $2 \
+        --region "$1" \
+        --stack-name "$2" \
         $ARG_STRING  2>&1)
     exit_status=$?
     set -e
@@ -113,13 +113,16 @@ cfn-deploy(){
     fi
 
     echo "STACK UPDATE CHECK ..."
+
     timeout $wait_timeout aws cloudformation wait stack-update-complete \
-        --region $1 \
-        --stack-name $2 \
+        --region "$1" \
+        --stack-name "$2" \
 
     fi
 
     echo -e "\nSUCCESSFULLY UPDATED - $2"
 }
 
-cfn-deploy $AWS_REGION $STACK_NAME $TEMPLATE_FILE $PARAMETERS_FILE $CAPABLITIES $WAIT_TIMEOUT
+
+cfn-deploy "$AWS_REGION" "$STACK_NAME" "$TEMPLATE_FILE" "$PARAMETERS_FILE" "$CAPABLITIES" "$WAIT_TIMEOUT"
+
