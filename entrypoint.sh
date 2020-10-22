@@ -73,6 +73,10 @@ cfn-deploy(){
 
     if ! aws cloudformation describe-stacks --region $1 --stack-name $2 ; then
 
+    echo -e "\nSTACK DOES NOT EXISTS, RUNNING VALIDATE"
+    aws cloudformation validate-template \
+        --template-body file://${template}
+
     echo -e "\nSTACK DOES NOT EXISTS, RUNNING CREATE"
     aws cloudformation create-stack \
         --region $1 \
