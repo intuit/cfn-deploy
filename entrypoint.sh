@@ -33,6 +33,7 @@ aws configure --profile ${AWS_PROFILE} set region "${AWS_REGION}"
 if [[ -z "$WAIT_TIMEOUT" ]];then
 echo "WAIT_TIMEOUT is not set. Defaulting to no timeout";
 WAIT_TIMEOUT=0
+fi
 if ! [[ "$WAIT_TIMEOUT" -eq "$WAIT_TIMEOUT" ]];
 then
 echo "WAIT_TIMEOUT should be a number." ; exit 4
