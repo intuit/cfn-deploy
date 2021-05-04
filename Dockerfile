@@ -11,7 +11,7 @@ LABEL com.github.actions.icon="upload-cloud"
 LABEL com.github.actions.color="orange"
 
 ENV DEBIAN_FRONTEND noninteractive
-RUN apt-get update && apt-get install -y awscli && apt-get install -y shellcheck && \
+RUN apt-get -y update && apt-get install -y awscli shellcheck && \
 rm -rf /var/lib/apt/lists/*
 
 ADD entrypoint.sh /entrypoint.sh
