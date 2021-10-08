@@ -71,6 +71,7 @@ cfn-deploy(){
     aws cloudformation create-stack \
         --region "$1" \
         --stack-name "$2" \
+        --on-failure "DELETE" \
         $ARG_STRING
 
     echo "\nSLEEP STILL STACK CREATES zzz ..."
