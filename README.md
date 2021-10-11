@@ -16,8 +16,9 @@ An example workflow for deploying a cloudformation template follows.
         CAPABLITIES: CAPABILITY_IAM
         AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
         AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
-
 ```
+
+**Note**: If the stack creation fails for some reason then it will be deleted instead of rolled back.
 
 ## Secrets
 
