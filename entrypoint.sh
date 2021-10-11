@@ -112,6 +112,19 @@ cfn-deploy(){
 
     fi
 
+    stack_output_display=$(aws cloudformation \
+      --region "$1" \
+      describe-stacks --stack-name "$2" \
+      --query "Stacks[0].Outputs")
+      
+    if [ "$stack_output_display" != "null" ]; then
+      echo "Stack output is : ";
+      echo "$stack_output_display";
+    else
+      echo "No stack output to display";
+    fi
+
+    
     echo -e "\nSUCCESSFULLY UPDATED - $2"
 }
 
