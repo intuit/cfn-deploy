@@ -18,7 +18,7 @@ An example workflow for deploying a cloudformation template follows.
         AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
 ```
 
-**Note**: If the stack creation fails for some reason then it will be deleted instead of rolled back.
+**Note**: The stack will created if it does not exist. If the initial stack creation fails for some reason then it will be deleted instead of rolled back.
 
 ## Secrets
 
