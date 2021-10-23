@@ -37,10 +37,12 @@ cfn-deploy(){
    # template     - the template file
    # parameters   - the paramters file
    # capablities  - capablities for IAM
+   # notificationArn - notification ARN for stack updates
 
     template=$3
     parameters=$4
     capablities=$5
+    notificationArn=$6
 
     ARG_CMD=" "
     if [[ -n $template ]];then
@@ -51,6 +53,9 @@ cfn-deploy(){
     fi
     if [[ -n $capablities ]];then
         ARG_CMD="${ARG_CMD}--capabilities ${capablities} "
+    fi
+    if [[ -n $notificationArn ]];then
+        ARG_CMD="${ARG_CMD}--notification-arns ${notificationArn} "
     fi
 
     ARG_STRING=$ARG_CMD
@@ -115,5 +120,5 @@ cfn-deploy(){
 }
 
 
-cfn-deploy "$AWS_REGION" "$STACK_NAME" "$TEMPLATE_FILE" "${PARAMETERS_FILE:-}" "$CAPABLITIES"
+cfn-deploy "$AWS_REGION" "$STACK_NAME" "$TEMPLATE_FILE" "${PARAMETERS_FILE:-}" "$CAPABLITIES" "$NOTIFICATION_ARNS"
 
