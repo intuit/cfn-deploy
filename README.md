@@ -14,6 +14,7 @@ An example workflow for deploying a cloudformation template follows.
         TEMPLATE_FILE: ec2.yml
         PARAMETERS_FILE: parameter.json
         CAPABLITIES: CAPABILITY_IAM
+        NOTIFICATION_ARNS: ("arn:aws:sns:us-east-2:012345678910:topic1" "arn:aws:sns:us-east-2:012345678910:topic2")
         AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
         AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
 
@@ -36,6 +37,7 @@ The custom env variables to be added are:
 `TEMPLATE_FILE` - Cloudformation template yaml file<br>
 `PARAMETERS_FILE` - Input parameters to the cloudformation stack as json file<br>
 `CAPABLITIES` - IAM capablities for the cloudformation stack<br>
+`NOTIFICATION_ARNS` - List of SNS topic ARNS to get stack updates<br>
 #### Optional
 `WAIT_TIMEOUT` - Timeout in seconds to exit from "wait" of create/update stack.  
 
