@@ -55,7 +55,7 @@ cfn-deploy(){
         ARG_CMD="${ARG_CMD}--capabilities ${capablities} "
     fi
     if [[ -n $notificationArn ]];then
-        ARG_CMD="${ARG_CMD}--notification-arns ${notificationArn} "
+        ARG_CMD="${ARG_CMD}--notification-arns ${notificationArn[@]} "
     fi
 
     ARG_STRING=$ARG_CMD
