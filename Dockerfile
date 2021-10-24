@@ -11,8 +11,7 @@ LABEL com.github.actions.icon="upload-cloud"
 LABEL com.github.actions.color="orange"
 
 ENV DEBIAN_FRONTEND noninteractive
-RUN apt-get -y update \
-&& apt-get install curl \
+RUN apt-get -y update; apt-get install curl \
 && apt-get install -y awscli shellcheck --no-install-recommends \
 && rm -rf /var/lib/apt/lists/*
 
