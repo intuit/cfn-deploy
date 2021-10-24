@@ -73,6 +73,8 @@ cfn-deploy(){
     parameters=$4
     capablities=$5
 
+    trap "{send-deployment-failure-slack-notification "$2" "$6" "$7"}" EXIT
+
     ARG_CMD=" "
     if [[ -n $template ]];then
         ARG_CMD="${ARG_CMD}--template-body file://${template} "
