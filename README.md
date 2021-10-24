@@ -74,12 +74,11 @@ More example template snippets: [AWS CloudFormation template snippets](https://d
 
 ## Test Github Actions while development
 
-`Act` is an open source project which allows you to run your project flow locally. 
-Depend on your machine follow the installation
-
 ### Prerequisites
 
-#### Installation of Act
+Depend on your machine follow the installation process.
+
+#### [Act](https://github.com/nektos/act) Setup
 
 For macOS
 ```
@@ -99,7 +98,7 @@ Other installation options
 curl https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash
 ```
 
-#### Installation of Docker
+#### Docker Setup
 
 `Act` uses docker to run workflows.
 
@@ -109,40 +108,32 @@ For Windows, follow instructions given [here](https://docs.docker.com/desktop/wi
 
 ### How to start
 
-`Act` reads Github Actions yaml file in `.github/workflows/` folder, which has the list of actions that needs to run.
-If you dont have already create one.
+[Act](https://github.com/nektos/act) is an open source project which allows you to run project workflow locally. 
+This workflow(s) are in the form of YAML file (can be either `.yml` or `.yaml`) residing in `.github/workflows/` folder of your 
+project directory.
+
+For more on workflow syntax, follow [here](https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions)
 
 To test your setup, is working fine or not, run below command. It will list the actions
 
-```act -l```
+```
+act -l
+```
 
-#### Few examples
+Output here
+![act](/docs/img/img.png)
+
+To run `Act` specific workflow or yaml/yml file within `.github/workflows/` folder on your branch, you need [github token](https://github.com/settings/tokens/new?scopes=repo&description=wiki%20page%20creator%20token)
 
 ```shell
-# usage:
-act [<event>] [options]
-If no argument or event name passed, it will with default as "on: push"
+act -w -W .github/workflows/testlocally.yml
+```
 
-# List the actions for the default event:
-act -l
+If you want to run for specific branch, you need to mention sae in workflow file and also need to pass github token, 
+which can be generated [here](https://github.com/settings/tokens/new?scopes=repo&description=wiki%20page%20creator%20token)
 
-# List the actions for a specific event:
-act workflow_dispatch -l
-
-# Run the default (`push`) event:
-act
-
-# Run a specific event:
-act pull_request
-
-# Run a specific job:
-act -j test
-
-# Run in dry-run mode:
-act -n
-
-# Enable verbose-logging (can be used with any of the above commands)
-act -v
+```shell
+act -n -W .github/workflows/testlocally.yml -s GITHUB_TOKEN=$GITHUB_TOKEN
 ```
 
 
