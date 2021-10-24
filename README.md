@@ -72,9 +72,14 @@ Refer to AWS docs for additional help: [Working with nested stacks](https://docs
 
 More example template snippets: [AWS CloudFormation template snippets](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/quickref-cloudformation.html#w2ab1c27c21c19b5)
 
-## Test Github Actions locally
+## Test Github Actions while development
 
-### Prerequistes
+`[Act](https://github.com/nektos/act)` is an open source project which allows you to run your project flow locally. 
+Depend on your machine follow the installation
+
+### Prerequisites
+
+#### Installation of Act
 
 For macOS
 ```
@@ -94,9 +99,52 @@ Other installation options
 curl https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash
 ```
 
-### How to Configure locally
+#### Installation of Docker
 
-`Act` reads Github Actions yaml file in `.github/workflows/`, which has the list of actions that needs to run.
+`Act` uses docker to run workflows.
+
+For macOS, follow instructions given [here](https://docs.docker.com/desktop/mac/install/)
+
+For Windows, follow instructions given [here](https://docs.docker.com/desktop/windows/install/)
+
+### How to start
+
+`Act` reads Github Actions yaml file in `.github/workflows/` folder, which has the list of actions that needs to run.
+If you dont have already create one.
+
+To test your setup, is working fine or not, run below command. It will list the actions
+
+```act -l```
+
+#### Few examples
+
+```shell
+# usage:
+act [<event>] [options]
+If no argument or event name passed, it will with default as "on: push"
+
+# List the actions for the default event:
+act -l
+
+# List the actions for a specific event:
+act workflow_dispatch -l
+
+# Run the default (`push`) event:
+act
+
+# Run a specific event:
+act pull_request
+
+# Run a specific job:
+act -j test
+
+# Run in dry-run mode:
+act -n
+
+# Enable verbose-logging (can be used with any of the above commands)
+act -v
+```
+
 
 Here is the sample for reference
 ![Demo](/docs/img/demo.gif)
