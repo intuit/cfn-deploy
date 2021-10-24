@@ -74,7 +74,7 @@ More example template snippets: [AWS CloudFormation template snippets](https://d
 
 ## Test Github Actions while development
 
-`[Act](https://github.com/nektos/act)` is an open source project which allows you to run your project flow locally. 
+`Act` is an open source project which allows you to run your project flow locally. 
 Depend on your machine follow the installation
 
 ### Prerequisites
