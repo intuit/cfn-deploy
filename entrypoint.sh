@@ -93,12 +93,6 @@ cfn-deploy(){
 
     if ! aws cloudformation describe-stacks --region "$1" --stack-name "$2" ; then
 
-    exit_status=$?
-    if [ $exit_status -ne 0 ] ; then
-        send-deployment-failure-slack-notification "$2" "$6" "$7"
-        exit $exit_status
-    fi
-
     echo -e "\nSTACK DOES NOT EXISTS, RUNNING VALIDATE"
     aws cloudformation validate-template \
         --template-body file://${template}
