@@ -13,6 +13,7 @@ set -x
 AWS_PROFILE="default"
 readonly DEPLOYMENT_SUCCESS_SLACK_MESSAGE="[:stack_name]: DEPLOYMENT SUCCESS"
 readonly DEPLOYMENT_FAILURE_SLACK_MESSAGE="[:stack_name]: DEPLOYMENT FAILURE"
+readonly DEFAULT_SLACK_WEBHOOK_URL=""
 
 #Check AWS credetials are defined in Gitlab Secrets
 if [[ -z "$AWS_ACCESS_KEY_ID" ]];then
@@ -35,28 +36,28 @@ aws configure --profile ${AWS_PROFILE} set region "${AWS_REGION}"
 function send-deployment-success-slack-notification {
     # Parameters
     # stack-name  - the stack name
+    # slack-webhook-url - the webhook for slack
 
-    stack_name=$1
-    post-slack-message "${DEPLOYMENT_SUCCESS_SLACK_MESSAGE/"[:stack_name]"/$stack_name}"
+    post-slack-message "${DEPLOYMENT_SUCCESS_SLACK_MESSAGE/"[:stack_name]"/$1}" "$2"
 }
 
 function send-deployment-failure-slack-notification {
     # Parameters
     # stack-name  - the stack name
+    # slack-webhook-url - the webhook for slack
 
-    stack_name=$1
-    post-slack-message "${DEPLOYMENT_FAILURE_SLACK_MESSAGE/"[:stack_name]"/$stack_name}"
+    post-slack-message "${DEPLOYMENT_FAILURE_SLACK_MESSAGE/"[:stack_name]"/$1}" "$2"
 }
 
 function post-slack-message {
 
     # Parameters
     # slack-message - the slack message to be sent
+    # slack-webhook-url - the webhook for slack
 
-    slack_message=$1
-    if [[ -n $SLACK_WEBHOOK_URL ]] ; then
+    if [[ -n $2 ]] ; then
         curl -X POST -H 'Content-type: application/json' \
-        --data '{"text":"'"${slack_message}"'"}' $SLACK_WEBHOOK_URL
+        --data '{"text":"'"$1"'"}' $2
     fi
 }
 
@@ -67,9 +68,8 @@ cfn-deploy(){
    # template     - the template file
    # parameters   - the paramters file
    # capablities  - capablities for IAM
+   # slack-webhook-url - the webhook for slack
 
-    region=$1
-    stack_name=$2
     template=$3
     parameters=$4
     capablities=$5
@@ -92,7 +92,7 @@ cfn-deploy(){
 
     echo -e "\nVERIFYING IF CFN STACK EXISTS ...!"
 
-    if ! aws cloudformation describe-stacks --region "${region}" --stack-name "${stack_name}" ; then
+    if ! aws cloudformation describe-stacks --region "$1" --stack-name "$2" ; then
 
     echo -e "\nSTACK DOES NOT EXISTS, RUNNING VALIDATE"
     aws cloudformation validate-template \
@@ -101,15 +101,15 @@ cfn-deploy(){
     echo -e "\nSTACK DOES NOT EXISTS, RUNNING CREATE"
     # shellcheck disable=SC2086
     aws cloudformation create-stack \
-        --region "${region}" \
-        --stack-name "${stack_name}" \
+        --region "$1" \
+        --stack-name "$2" \
         --on-failure "DELETE" \
         $ARG_STRING
 
     echo "\nSLEEP STILL STACK CREATES zzz ..."
     aws cloudformation wait stack-create-complete \
-        --region "${region}" \
-        --stack-name "${stack_name}" \
+        --region "$1" \
+        --stack-name "$2" \
 
     else
 
@@ -118,8 +118,8 @@ cfn-deploy(){
     set +e
     # shellcheck disable=SC2086
     stack_output=$( aws cloudformation update-stack \
-        --region "${region}" \
-        --stack-name "${stack_name}" \
+        --region "$1" \
+        --stack-name "$2" \
         $ARG_STRING  2>&1)
     exit_status=$?
     set -e
@@ -129,10 +129,10 @@ cfn-deploy(){
     if [ $exit_status -ne 0 ] ; then
 
         if [[ $stack_output == *"ValidationError"* && $stack_output == *"No updates"* ]] ; then
-            send-deployment-failure-slack-notification "${stack_name}"
+            send-deployment-failure-slack-notification "$2" "${6:-${DEFAULT_SLACK_WEBHOOK_URL}}"
             echo -e "\nNO OPERATIONS PERFORMED" && exit 0
         else
-            send-deployment-failure-slack-notification "${stack_name}"
+            send-deployment-failure-slack-notification "$2" "${6:-${DEFAULT_SLACK_WEBHOOK_URL}}"
             exit $exit_status
         fi
     fi
@@ -159,7 +159,7 @@ cfn-deploy(){
 
     
     echo -e "\nSUCCESSFULLY UPDATED - $2"
-    send-deployment-success-slack-notification "${stack_name}"
+    send-deployment-success-slack-notification "$2" "${6:-${DEFAULT_SLACK_WEBHOOK_URL}}"
 }
 
 
