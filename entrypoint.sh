@@ -54,7 +54,7 @@ function post-slack-message {
     # slack-message - the slack message to be sent
 
     slack_message=$1
-    if [[ -n "$SLACK_WEBHOOK_URL" ]] ; then
+    if [[ -n $SLACK_WEBHOOK_URL ]] ; then
         curl -X POST -H 'Content-type: application/json' \
         --data '{"text":"'"${slack_message}"'"}' $SLACK_WEBHOOK_URL
     fi
