@@ -72,6 +72,35 @@ Refer to AWS docs for additional help: [Working with nested stacks](https://docs
 
 More example template snippets: [AWS CloudFormation template snippets](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/quickref-cloudformation.html#w2ab1c27c21c19b5)
 
+## Test Github Actions locally
+
+### Prerequistes
+
+For macOS
+```
+brew install act
+```
+
+for Windows
+```
+choco install act-cli
+or
+scoop install act
+```
+
+Other installation options
+
+```
+curl https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash
+```
+
+### How to Configure locally
+
+`Act` reads Github Actions yaml file in `.github/workflows/`, which has the list of actions that needs to run.
+
+Here is the sample for reference
+![Demo](/docs/img/demo.gif)
+
 ## Contributing
 
 See [Contributing](https://github.com/intuit/cfn-deploy/blob/master/.github/CONTRIBUTING.md)
