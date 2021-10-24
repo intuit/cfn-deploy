@@ -116,20 +116,31 @@ For more on workflow syntax, follow [here](https://docs.github.com/en/actions/le
 
 To test your setup, is working fine or not, run below command. It will list the actions
 
-```
+```shell
 act -l
 ```
 
-Output here
-![act](/docs/img/img.png)
+It will list all workflows
+
+```shell
+ID               Stage  Name
+linter           0      linter
+TestOnYourLocal  0      TestOnYourLocal
+```
 
 To run `Act` specific workflow or yaml/yml file within `.github/workflows/` folder on your branch, you need [github token](https://github.com/settings/tokens/new?scopes=repo&description=wiki%20page%20creator%20token)
 
 ```shell
-act -w -W .github/workflows/testlocally.yml
+act -W .github/workflows/testlocally.yml
 ```
 
-If you want to run for specific branch, you need to mention sae in workflow file and also need to pass github token, 
+Dryrun mode
+
+```shell
+act -n -W .github/workflows/testlocally.yml
+```
+
+If you want to run for specific branch, you need to mention same in workflow file and also need to pass github token, 
 which can be generated [here](https://github.com/settings/tokens/new?scopes=repo&description=wiki%20page%20creator%20token)
 
 ```shell
