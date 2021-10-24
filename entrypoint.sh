@@ -129,10 +129,10 @@ cfn-deploy(){
     if [ $exit_status -ne 0 ] ; then
 
         if [[ $stack_output == *"ValidationError"* && $stack_output == *"No updates"* ]] ; then
-            send-deployment-failure-slack-notification "$2" "${6:-${DEFAULT_SLACK_WEBHOOK_URL}}"
+            send-deployment-failure-slack-notification "$2" "$6"
             echo -e "\nNO OPERATIONS PERFORMED" && exit 0
         else
-            send-deployment-failure-slack-notification "$2" "${6:-${DEFAULT_SLACK_WEBHOOK_URL}}"
+            send-deployment-failure-slack-notification "$2" "$6"
             exit $exit_status
         fi
     fi
@@ -159,9 +159,9 @@ cfn-deploy(){
 
     
     echo -e "\nSUCCESSFULLY UPDATED - $2"
-    send-deployment-success-slack-notification "$2" "${6:-${DEFAULT_SLACK_WEBHOOK_URL}}"
+    send-deployment-success-slack-notification "$2" "$6"
 }
 
 
-cfn-deploy "$AWS_REGION" "$STACK_NAME" "$TEMPLATE_FILE" "${PARAMETERS_FILE:-}" "$CAPABLITIES"
+cfn-deploy "$AWS_REGION" "$STACK_NAME" "$TEMPLATE_FILE" "${PARAMETERS_FILE:-}" "$CAPABLITIES" "${SLACK_WEBHOOK_URL:DEFAULT_SLACK_WEBHOOK_URL}"
 
