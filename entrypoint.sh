@@ -129,7 +129,7 @@ cfn-deploy(){
     if [ $exit_status -ne 0 ] ; then
 
         if [[ $stack_output == *"ValidationError"* && $stack_output == *"No updates"* ]] ; then
-            send-deployment-failure-slack-notification "$2" "$6"
+            send-deployment-success-slack-notification "$2" "$6"
             echo -e "\nNO OPERATIONS PERFORMED" && exit 0
         else
             send-deployment-failure-slack-notification "$2" "$6"
