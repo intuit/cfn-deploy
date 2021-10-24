@@ -12,7 +12,7 @@ LABEL com.github.actions.color="orange"
 
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get -y update \
-&& apt-get install -y awscli shellcheck --no-install-recommends \
+&& apt-get install -y curl awscli shellcheck --no-install-recommends \
 && rm -rf /var/lib/apt/lists/*
 
 COPY entrypoint.sh /entrypoint.sh

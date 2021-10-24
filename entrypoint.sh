@@ -11,6 +11,8 @@ set -o pipefail
 set -x
 
 AWS_PROFILE="default"
+readonly DEFAULT_SLACK_WEBHOOK_URL=""
+readonly DEFAULT_GITHUB_JOB_LINK="https://github.com/intuit/cfn-deploy"
 
 #Check AWS credetials are defined in Gitlab Secrets
 if [[ -z "$AWS_ACCESS_KEY_ID" ]];then
@@ -30,6 +32,34 @@ aws configure --profile ${AWS_PROFILE} set aws_access_key_id "${AWS_ACCESS_KEY_I
 aws configure --profile ${AWS_PROFILE} set aws_secret_access_key "${AWS_SECRET_ACCESS_KEY}"
 aws configure --profile ${AWS_PROFILE} set region "${AWS_REGION}"
 
+function send-deployment-success-slack-notification {
+    # Parameters
+    # stack-name  - the stack name
+    # slack-webhook-url - the webhook for slack
+
+    post-slack-message "<${3}|${1}> : DEPLOYMENT SUCCESS" "${2}"
+}
+
+function send-deployment-failure-slack-notification {
+    # Parameters
+    # stack-name  - the stack name
+    # slack-webhook-url - the webhook for slack
+
+    post-slack-message "<${3}|${1}> : DEPLOYMENT FAILURE" "${2}"
+}
+
+function post-slack-message {
+
+    # Parameters
+    # slack-message - the slack message to be sent
+    # slack-webhook-url - the webhook for slack
+
+    if [[ -n $2 ]] ; then
+        curl -X POST -H 'Content-type: application/json' \
+        --data '{"text":"'"$1"'"}' $2
+    fi
+}
+
 cfn-deploy(){
    #Paramters
    # region       - the AWS region
@@ -37,6 +67,7 @@ cfn-deploy(){
    # template     - the template file
    # parameters   - the paramters file
    # capablities  - capablities for IAM
+   # slack-webhook-url - the webhook for slack
 
     template=$3
     parameters=$4
@@ -97,11 +128,12 @@ cfn-deploy(){
     if [ $exit_status -ne 0 ] ; then
 
         if [[ $stack_output == *"ValidationError"* && $stack_output == *"No updates"* ]] ; then
+            send-deployment-success-slack-notification "$2" "$6" "$7"
             echo -e "\nNO OPERATIONS PERFORMED" && exit 0
         else
+            send-deployment-failure-slack-notification "$2" "$6" "$7"
             exit $exit_status
         fi
-
     fi
 
     echo "STACK UPDATE CHECK ..."
@@ -126,8 +158,9 @@ cfn-deploy(){
 
     
     echo -e "\nSUCCESSFULLY UPDATED - $2"
+    send-deployment-success-slack-notification "$2" "$6" "$7"
 }
 
 
-cfn-deploy "$AWS_REGION" "$STACK_NAME" "$TEMPLATE_FILE" "${PARAMETERS_FILE:-}" "$CAPABLITIES"
+cfn-deploy "$AWS_REGION" "$STACK_NAME" "$TEMPLATE_FILE" "${PARAMETERS_FILE:-}" "$CAPABLITIES" "${SLACK_WEBHOOK_URL:-${DEFAULT_SLACK_WEBHOOK_URL}}" "${GITHUB_JOB_LINK:-${DEFAULT_GITHUB_JOB_LINK}}"
 
