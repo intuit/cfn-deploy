@@ -16,6 +16,7 @@ An example workflow for deploying a cloudformation template follows.
         CAPABLITIES: CAPABILITY_IAM
         AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
         AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+        SLACK_WEBHOOK_URL: ${{secrets.SLACK_WEBHOOK_URL}}
 ```
 
 **Note**: The stack will created if it does not exist. If the initial stack creation fails for some reason then it will be deleted instead of rolled back.
@@ -38,7 +39,8 @@ The custom env variables to be added are:
 `PARAMETERS_FILE` - (If required) Input parameters to the cloudformation stack as json file<br>
 `CAPABLITIES` - IAM capablities for the cloudformation stack<br>
 #### Optional
-`WAIT_TIMEOUT` - Timeout in seconds to exit from "wait" of create/update stack.  
+`WAIT_TIMEOUT` - Timeout in seconds to exit from "wait" of create/update stack<br>
+`SLACK_WEBHOOK_URL` - Slack webhook url for Slack Notification. Refer [Slack Documentation](https://api.slack.com/tutorials/slack-apps-hello-world)
 
 ## Nested Stacks
 
