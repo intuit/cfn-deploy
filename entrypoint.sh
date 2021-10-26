@@ -11,6 +11,9 @@ set -o pipefail
 set -x
 
 AWS_PROFILE="default"
+readonly DEFAULT_SLACK_WEBHOOK_URL=""
+readonly DEFAULT_GITHUB_JOB_LINK="https://github.com/intuit/cfn-deploy"
+DEPLOYMENT_STATUS="IN_PROGRESS"
 
 #Check AWS credetials are defined in Gitlab Secrets
 if [[ -z "$AWS_ACCESS_KEY_ID" ]];then
@@ -30,19 +33,59 @@ aws configure --profile ${AWS_PROFILE} set aws_access_key_id "${AWS_ACCESS_KEY_I
 aws configure --profile ${AWS_PROFILE} set aws_secret_access_key "${AWS_SECRET_ACCESS_KEY}"
 aws configure --profile ${AWS_PROFILE} set region "${AWS_REGION}"
 
+function post-exit {
+  if [ $DEPLOYMENT_STATUS == "SUCCESS" ]; then
+    send-deployment-success-slack-notification "$1" "$2" "$3"
+  else
+    send-deployment-failure-slack-notification "$1" "$2" "$3"
+  fi
+}
+
+function send-deployment-failure-slack-notification {
+    # Parameters
+    # stack-name  - the stack name
+    # slack-webhook-url - the webhook for slack
+
+    post-slack-message "<${3}|${1}> : DEPLOYMENT FAILURE" "${2}"
+}
+
+function send-deployment-success-slack-notification {
+    # Parameters
+    # stack-name  - the stack name
+    # slack-webhook-url - the webhook for slack
+
+    post-slack-message "<${3}|${1}> : DEPLOYMENT SUCCESS" "${2}"
+}
+
+function post-slack-message {
+
+    # Parameters
+    # slack-message - the slack message to be sent
+    # slack-webhook-url - the webhook for slack
+
+    if [[ -n $2 ]] ; then
+        curl -X POST -H 'Content-type: application/json' \
+        --data '{"text":"'"$1"'"}' $2
+    fi
+}
+
 cfn-deploy(){
    #Paramters
-   # region       - the AWS region
-   # stack-name   - the stack name
-   # template     - the template file
-   # parameters   - the paramters file
-   # capablities  - capablities for IAM
-   # notificationArn - notification ARN for stack updates
+   # region             - the AWS region
+   # stack-name         - the stack name
+   # template           - the template file
+   # parameters         - the paramters file
+   # capablities        - capablities for IAM
+   # slack-webhook-url  - the webhook for slack
+   # github-job-link    - the github job link
+   # notificationArn    - notification ARN for stack updates
 
     template=$3
     parameters=$4
     capablities=$5
-    notificationArn=$6
+    notificationArn=$8
+
+    trap "post-exit "$2" "$6" "$7"" EXIT
 
     ARG_CMD=" "
     if [[ -n $template ]];then
@@ -76,6 +119,7 @@ cfn-deploy(){
     aws cloudformation create-stack \
         --region "$1" \
         --stack-name "$2" \
+        --on-failure "DELETE" \
         $ARG_STRING
 
     echo "\nSLEEP STILL STACK CREATES zzz ..."
@@ -101,11 +145,11 @@ cfn-deploy(){
     if [ $exit_status -ne 0 ] ; then
 
         if [[ $stack_output == *"ValidationError"* && $stack_output == *"No updates"* ]] ; then
+          DEPLOYMENT_STATUS="SUCCESS"
             echo -e "\nNO OPERATIONS PERFORMED" && exit 0
         else
             exit $exit_status
         fi
-
     fi
 
     echo "STACK UPDATE CHECK ..."
@@ -116,9 +160,23 @@ cfn-deploy(){
 
     fi
 
+    stack_output_display=$(aws cloudformation \
+      --region "$1" \
+      describe-stacks --stack-name "$2" \
+      --query "Stacks[0].Outputs")
+      
+    if [ "$stack_output_display" != "null" ]; then
+      echo "Stack output is : ";
+      echo "$stack_output_display";
+    else
+      echo "No stack output to display";
+    fi
+
+
     echo -e "\nSUCCESSFULLY UPDATED - $2"
+    DEPLOYMENT_STATUS="SUCCESS"
 }
 
 
-cfn-deploy "$AWS_REGION" "$STACK_NAME" "$TEMPLATE_FILE" "${PARAMETERS_FILE:-}" "$CAPABLITIES" "$NOTIFICATION_ARNS"
+cfn-deploy "$AWS_REGION" "$STACK_NAME" "$TEMPLATE_FILE" "${PARAMETERS_FILE:-}" "$CAPABLITIES" "${SLACK_WEBHOOK_URL:-${DEFAULT_SLACK_WEBHOOK_URL}}" "${GITHUB_JOB_LINK:-${DEFAULT_GITHUB_JOB_LINK}}" "$NOTIFICATION_ARNS"
 

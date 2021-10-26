@@ -1,0 +1,26 @@
+name: TestLocally
+
+on: push
+
+jobs:
+  TestOnYourLocal:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Check out code
+      - name: Checkout branch
+        uses: actions/checkout@v2
+       # specific branch
+       # with:
+       #   ref: readme-on-git-actions
+      - name: Create env file
+        run: |
+          touch .env
+          echo API_ENDPOINT="https://xxxxxxxx.us-west-2.amazonaws.com" >> .env
+          echo API_KEY=${{ secrets.API_KEY }} >> .env
+          cat .env
+      # This is the a separate action that sets up buildx runner
+      - name: Set up Docker Build
+        uses: docker/setup-buildx-action@v1
+        with:
+          dockerfile: "Dockerfile"
