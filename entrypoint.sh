@@ -78,10 +78,12 @@ cfn-deploy(){
    # capablities        - capablities for IAM
    # slack-webhook-url  - the webhook for slack
    # github-job-link    - the github job link
+   # notificationArn    - notification ARN for stack updates
 
     template=$3
     parameters=$4
     capablities=$5
+    notificationArn=$8
 
     trap "post-exit "$2" "$6" "$7"" EXIT
 
@@ -94,6 +96,9 @@ cfn-deploy(){
     fi
     if [[ -n $capablities ]];then
         ARG_CMD="${ARG_CMD}--capabilities ${capablities} "
+    fi
+    if [[ -n $notificationArn ]];then
+        ARG_CMD="${ARG_CMD}--notification-arns ${notificationArn[@]} "
     fi
 
     ARG_STRING=$ARG_CMD
@@ -173,5 +178,5 @@ cfn-deploy(){
 }
 
 
-cfn-deploy "$AWS_REGION" "$STACK_NAME" "$TEMPLATE_FILE" "${PARAMETERS_FILE:-}" "$CAPABLITIES" "${SLACK_WEBHOOK_URL:-${DEFAULT_SLACK_WEBHOOK_URL}}" "${GITHUB_JOB_LINK:-${DEFAULT_GITHUB_JOB_LINK}}"
+cfn-deploy "$AWS_REGION" "$STACK_NAME" "$TEMPLATE_FILE" "${PARAMETERS_FILE:-}" "$CAPABLITIES" "${SLACK_WEBHOOK_URL:-${DEFAULT_SLACK_WEBHOOK_URL}}" "${GITHUB_JOB_LINK:-${DEFAULT_GITHUB_JOB_LINK}}" "$NOTIFICATION_ARNS"
 
